@@ -1,0 +1,37 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# local memory stores (never commit a memory DB)
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# model cache (fastembed downloads here)
+.fastembed_cache/
+.cache/
+
+# PyInstaller build outputs
+*.spec.bak
+
+# os
+.DS_Store
+
+# benchmark data (CC BY-NC — never redistributed) + local artifacts
+benchmarks/locomo/data/
+benchmarks/locomo/locomo/
+benchmarks/locomo/*.jsonl
+.env
+*.log

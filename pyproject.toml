@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "engram-lite"
+version = "0.1.0"
+description = "Local memory for AI agents — served by persona, domain, and task. Survives restarts. One machine, many agents."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Novarque" }]
+keywords = ["ai", "agents", "memory", "llm", "hermes"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "sqlite-vec>=0.1.6",   # vector index inside SQLite (facts_vec)
+    "fastembed>=0.3.6",    # small, local, offline embedding model
+    "numpy>=1.26",         # vector math
+]
+
+[project.urls]
+Homepage = "https://github.com/novarque/engram-lite"
+Repository = "https://github.com/novarque/engram-lite"
+Issues = "https://github.com/novarque/engram-lite/issues"
+Changelog = "https://github.com/novarque/engram-lite/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "anyio>=4", "ruff>=0.8"]
+build = ["pyinstaller>=6"]               # build the standalone binary (packaging/)
+
+[project.scripts]
+engram = "engram.cli.main:main"   # `engram demo | status | rebuild`
+
+[tool.hatch.build.targets.sdist]
+# keep the sdist to what a build needs — docs/ and benchmarks/ live on GitHub
+only-include = ["src/engram", "tests", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/engram"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]

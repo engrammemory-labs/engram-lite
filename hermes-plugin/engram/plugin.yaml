@@ -1,0 +1,7 @@
+manifest_version: 1
+name: engram
+version: 0.1.0
+description: "Conditioned local memory: each agent profile is served the memory that fits its persona, domain, and task — restart-proof, offline, one shared store for every profile. No API key."
+homepage: "https://github.com/novarque/engram-lite"
+pip_dependencies:
+  - "engram-lite @ git+https://github.com/novarque/engram-lite-opensource.git"  # swap to plain 'engram-lite' after the PyPI release
