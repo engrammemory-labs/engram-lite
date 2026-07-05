@@ -29,10 +29,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/novarque/engram-lite"
-Repository = "https://github.com/novarque/engram-lite"
-Issues = "https://github.com/novarque/engram-lite/issues"
-Changelog = "https://github.com/novarque/engram-lite/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/engrammemory-labs/engram-lite"
+Repository = "https://github.com/engrammemory-labs/engram-lite"
+Issues = "https://github.com/engrammemory-labs/engram-lite/issues"
+Changelog = "https://github.com/engrammemory-labs/engram-lite/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "anyio>=4", "ruff>=0.8"]

@@ -1,8 +1,7 @@
-# LoCoMo benchmark — replayable harness
+# LoCoMo benchmark — results
 
-engram-lite's LoCoMo results, and the exact scripts that produced them.
-Every run is deterministic on the memory side: re-running the harness
-reproduces the same digest.
+engram-lite's LoCoMo results. Every run is deterministic on the memory
+side: two from-scratch runs of the same protocol produce identical outputs.
 
 ## Results (2026-07-04, this harness)
 
@@ -34,30 +33,6 @@ LLM calls to build the memory from 5,882 conversation turns: engram-lite 0;
 mem0 approximately 2 per turn, by design of its `add()` pipeline
 ([arXiv:2504.19413](https://arxiv.org/abs/2504.19413)). engram-lite ingestion
 cost: $0, ~2 minutes, fully local.
-
-## The three scripts
-
-| script | measures | LLM needed |
-|---|---|---|
-| `track_a.py` | retrieval-evidence recall (were the answer-bearing turns served?) + grep baseline + write-path loss + determinism digest | none — $0 |
-| `track_b_mem0_parity.py` | J + F1 under mem0's published protocol (no abstention path, lenient judge, 60-memory budget) — the comparable number | answerer + judge (~$3.50 haiku) |
-| `track_b_strict.py` | J + F1 under a stricter harness (abstention mandated, date-strict judge, 30 memories) — engram-lite's conservative lower bound; also the adversarial (`--cat5`) receipt | answerer + judge |
-
-## Reproduce
-
-```bash
-# 1. dataset (CC BY-NC 4.0 — research use; not redistributed here)
-git clone --depth 1 https://github.com/snap-research/locomo
-mkdir -p data && cp locomo/data/locomo10.json data/
-
-# 2. retrieval track — free, no keys, deterministic
-ENGRAM_EMBEDDER=local ENGRAM_EMBEDDER_MODEL=BAAI/bge-base-en-v1.5 \
-  python track_a.py                # run twice: identical DIGEST expected
-
-# 3. the mem0-comparable J score (needs ANTHROPIC_API_KEY, ~$3.50)
-ENGRAM_EMBEDDER=local ENGRAM_EMBEDDER_MODEL=BAAI/bge-base-en-v1.5 \
-  python track_b_mem0_parity.py
-```
 
 ## Protocol decisions (all in-code, all disclosed)
 

@@ -4,7 +4,7 @@
 
 Most agent memory is a shared pile: every agent gets the same top-k for the same query. In our benchmark (methodology below), an agent fed flat shared memory **hallucinated more than an agent given no memory at all.** Serving each agent the memory that fits **who it is** (its persona, its domain, the task in front of it) **doubled task success (40% to 80%)** and **cut hallucination to a third.**
 
-And the memory layer never calls an LLM. On **LoCoMo** — the long-conversation memory benchmark — engram-lite scores **J 68.3** with **zero LLM calls and $0 to build the memory**. The protocol, footnotes, a harness you can re-run yourself, and the full comparison against the leading LLM-based memory systems live in [`benchmarks/locomo/`].
+And the memory layer never calls an LLM. On **LoCoMo** — the long-conversation memory benchmark — engram-lite scores **J 68.3** with **zero LLM calls and $0 to build the memory**. The protocol, footnotes, and the full comparison against the leading LLM-based memory systems live in [`benchmarks/locomo/`](https://github.com/engrammemory-labs/engram-lite/blob/main/benchmarks/locomo/README.md).
 
 engram-lite is that serving layer, small enough to run on your laptop:
 
@@ -80,9 +80,9 @@ pip install engram-lite
 hermes plugins install engrammemory-labs/engram-lite/hermes-plugin/engram
 
 # 3. activate and configure it
-hermes memory setup     # choose "engram"; the wizard asks persona / domain /
-                        # scope_tags — fill all three for conditioned serving,
-                        # or leave them empty for plain memory
+hermes memory setup     # choose "engram", answer one question — what is this
+                        # agent? (e.g. "DevOps engineer") — everything else is
+                        # derived; leave it empty for plain memory
 ```
 
 Then just `hermes chat`. From that point: every turn is auto-captured through the salience gate, the agent boots with a snapshot of what it already knows, and `memory_search` / `memory_write` / `memory_diagnose` are available as in-loop tools. Restart the agent; it remembers. Point several agents at one `db_path` (a wizard field) and the lane model keeps each one's serving scoped.
@@ -113,8 +113,8 @@ LLM-judge score (J) on LoCoMo categories 1–4 (1,540 questions), under the eval
 
 - **Zero LLM calls to build the memory.** Ingesting the 5,882-turn corpus costs $0 and takes about 2 minutes, fully local.
 - On the adversarial category (trick questions where the right answer is "no information"): J 64.6. Honest abstention is a feature, not a failure mode.
-- Retrieval alone (no LLM anywhere, free to re-run): 85.7% of questions have their evidence served in the top-30, vs 59.9% for grep over the raw transcript. Two from-scratch runs produce the identical digest.
-- Answerer and judge: claude-haiku-4-5 (measured judge sensitivity: ±2 for prompt wording, ±0 for judge model). LoCoMo: Maharana et al. ([arXiv:2402.17753](https://arxiv.org/abs/2402.17753)). Everything is replayable from [`benchmarks/locomo/`].
+- Retrieval alone (no LLM anywhere): 85.7% of questions have their evidence served in the top-30, vs 59.9% for grep over the raw transcript. Two from-scratch runs produce the identical digest.
+- Answerer and judge: claude-haiku-4-5 (measured judge sensitivity: ±2 for prompt wording, ±0 for judge model). LoCoMo: Maharana et al. ([arXiv:2402.17753](https://arxiv.org/abs/2402.17753)). Full protocol notes in [`benchmarks/locomo/`](https://github.com/engrammemory-labs/engram-lite/blob/main/benchmarks/locomo/README.md).
 
 ### What memory costs your prompt, per turn
 
@@ -159,8 +159,7 @@ Deterministic, microseconds, no LLM in the read path, and every served fact carr
 
 ```bash
 pip install -e ".[dev]"
-ENGRAM_EMBEDDER=hash pytest -q     # offline, fast
-ruff check src tests
+ruff check src
 ```
 
 ## License

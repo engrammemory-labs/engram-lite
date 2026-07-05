@@ -376,14 +376,19 @@ class EngramHermesProvider(MemoryProvider):
                 current = json.loads(path.read_text())
             except Exception:
                 pass
+        new_persona = (values or {}).get("persona")
+        persona_changed = bool(new_persona) and new_persona != current.get("persona")
         current.update({k: v for k, v in (values or {}).items() if v not in (None, "")})
         # derive the taxonomy from the persona and PERSIST it — visible and
-        # editable in config.json, but never asked for in the wizard
+        # editable in config.json, but never asked for in the wizard. When the
+        # wizard sets a NEW persona, the derived fields are refreshed too:
+        # stale taxonomy from a previous identity must never survive a rename.
         persona = current.get("persona")
-        if persona and not (current.get("domain") and current.get("scope_tags")):
+        if persona and (persona_changed
+                        or not (current.get("domain") and current.get("scope_tags"))):
             domain, scope = derive_profile(persona)
-            current.setdefault("domain", domain)
-            current.setdefault("scope_tags", ",".join(scope))
+            current["domain"] = domain
+            current["scope_tags"] = ",".join(scope)
         path.write_text(json.dumps(current, indent=2) + "\n")
 
     # -- internal ---------------------------------------------------------------

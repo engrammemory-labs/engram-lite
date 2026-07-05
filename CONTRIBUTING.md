@@ -5,12 +5,11 @@ Thanks for helping build better agent memory.
 ## Dev setup
 
 ```bash
-git clone https://github.com/novarque/engram-lite.git
+git clone https://github.com/engrammemory-labs/engram-lite.git
 cd engram-lite
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-ENGRAM_EMBEDDER=hash pytest -q     # offline, no model download
-ruff check src tests
+ruff check src
 ```
 
 ## Ground rules
