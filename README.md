@@ -9,7 +9,7 @@ And the memory layer never calls an LLM. On **LoCoMo** — the long-conversation
 engram-lite is that serving layer, small enough to run on your laptop:
 
 - **Conditioned serving.** Register a profile per agent (persona / domain / scope). The same question serves your on-call SRE agent the alert, the trace, and the mitigation runbook, and serves your release agent the deploy, the rollback, and the freeze policy. Out-of-lane questions correctly serve nothing.
-- **Restart-proof.** One SQLite file holds everything. Your agent restarts tomorrow and picks up exactly what it knew.
+- **Restart-proof.** Everything is stored in a single SQLite file. Your agent can restart tomorrow and pick up exactly where it left off.
 - **Self-cleaning.** A salience gate skips junk (code, command output, questions). New facts are de-duplicated, updates supersede old versions, stale facts expire, and the store stays bounded.
 - **Zero infrastructure.** No server, no cloud, no accounts, no telemetry. SQLite plus a local embedding model. `pip install` and you are running.
 - **Explainable forgetting.** Every drop, merge, truncation, and abstention is recorded with the rule that fired (`Memory.decisions()`). "Why don't you remember X?" has an answer — something an LLM-written memory can't give you, because its keep/drop decisions live inside model weights.
