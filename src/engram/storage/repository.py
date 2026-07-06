@@ -327,3 +327,15 @@ def nearest(conn: sqlite3.Connection, qvec, k: int) -> List[Tuple[str, float]]:
         (sqlite_vec.serialize_float32(qvec), k),
     ).fetchall()
     return [(r[0], r[1]) for r in rows]
+
+
+def get_meta(conn: sqlite3.Connection, key: str) -> str | None:
+    row = conn.execute("SELECT value FROM store_meta WHERE key = ?", (key,)).fetchone()
+    return row[0] if row else None
+
+
+def set_meta(conn: sqlite3.Connection, key: str, value: str) -> None:
+    conn.execute(
+        "INSERT INTO store_meta(key, value) VALUES(?, ?) "
+        "ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value))
+    conn.commit()

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "engram-lite"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local memory for AI agents — served by persona, domain, and task. Survives restarts. One machine, many agents."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -43,7 +43,7 @@ engram = "engram.cli.main:main"   # `engram demo | status | rebuild`
 
 [tool.hatch.build.targets.sdist]
 # keep the sdist to what a build needs — docs/ and benchmarks/ live on GitHub
-only-include = ["src/engram", "tests", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
+only-include = ["src/engram", "README.md", "LICENSE", "CHANGELOG.md", "pyproject.toml"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/engram"]

@@ -1,4 +1,1 @@
-"""Framework integrations. Import the one you need, e.g.:
-
-    from engram.integrations.hermes import EngramMemoryProvider
-"""
+"""Adapters that ship inside the wheel (the Claude Code hooks live here)."""

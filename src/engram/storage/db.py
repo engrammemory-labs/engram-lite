@@ -10,6 +10,7 @@ access behind a lock.
 """
 from __future__ import annotations
 
+import os
 import sqlite3
 import time
 
@@ -43,6 +44,16 @@ def _open_once(path: str, dim: int) -> sqlite3.Connection:
         raise
 
 
+def _restrict_permissions(path: str) -> None:
+    """Captured prompts and assistant output are personal data: the store and
+    its WAL siblings get the same 0600 the token state file gets."""
+    for suffix in ("", "-wal", "-shm"):
+        try:
+            os.chmod(path + suffix, 0o600)
+        except OSError:
+            pass
+
+
 def connect(path: str, dim: int) -> sqlite3.Connection:
     """Open with bounded retry on first-open contention.
 
@@ -56,7 +67,9 @@ def connect(path: str, dim: int) -> sqlite3.Connection:
     last: Exception | None = None
     for attempt in range(12):
         try:
-            return _open_once(path, dim)
+            conn = _open_once(path, dim)
+            _restrict_permissions(path)
+            return conn
         except sqlite3.OperationalError as e:
             msg = str(e).lower()
             if not ("locked" in msg or "busy" in msg or "already exists" in msg):

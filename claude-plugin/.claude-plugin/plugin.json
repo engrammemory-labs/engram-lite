@@ -1,0 +1,9 @@
+{
+  "name": "engram",
+  "description": "Deterministic long-term memory for Claude Code: every prompt captured, role-scoped memories served each turn, memory that survives /clear and compaction, and a decision ledger that explains every keep, merge, and drop. Local only — no cloud, no keys.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Engram Memory Labs",
+    "url": "https://github.com/engrammemory-labs/engram-lite"
+  }
+}

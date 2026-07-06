@@ -1,0 +1,116 @@
+{
+  "id": "engram",
+  "name": "Engram Memory",
+  "description": "Deterministic long-term memory served from a local sidecar: role-scoped recall, zero cloud calls, and a decision ledger that explains every keep, merge, and drop.",
+  "kind": "memory",
+  "commandAliases": [{ "name": "engram" }],
+  "activation": {
+    "onStartup": false,
+    "onCommands": ["engram"]
+  },
+  "contracts": {
+    "tools": ["memory_search", "memory_store", "memory_diagnose"]
+  },
+  "uiHints": {
+    "persona": {
+      "label": "Agent Persona",
+      "placeholder": "DevOps engineer",
+      "help": "One sentence: what is this agent? Domain and memory scope are derived automatically."
+    },
+    "dbPath": {
+      "label": "Database Path",
+      "placeholder": "~/.engram/openclaw.db",
+      "advanced": true,
+      "help": "SQLite store for this agent's memory. Point multiple integrations at one file to share a store."
+    },
+    "agentId": {
+      "label": "Agent Id",
+      "placeholder": "openclaw",
+      "advanced": true,
+      "help": "Identity used for lane scoping and provenance inside the store"
+    },
+    "pythonPath": {
+      "label": "Python Interpreter",
+      "advanced": true,
+      "help": "Optional explicit interpreter with engram-lite installed. When omitted, the plugin tries `engram` on PATH, then uvx, then pipx."
+    },
+    "autoRecall": {
+      "label": "Auto-Recall",
+      "help": "Inject role-scoped memories into context before each prompt"
+    },
+    "autoCapture": {
+      "label": "Auto-Capture",
+      "help": "Capture durable facts from user messages after each agent run"
+    },
+    "allowDownload": {
+      "label": "Allow Engine Download",
+      "advanced": true,
+      "help": "Off by default: the plugin never fetches anything on its own. When enabled, uvx/pipx may download the version-pinned engram-lite release if the engine is not installed."
+    },
+    "topK": {
+      "label": "Recall Depth",
+      "advanced": true,
+      "placeholder": "4",
+      "help": "Maximum memories injected per prompt from search"
+    },
+    "bootK": {
+      "label": "Boot Depth",
+      "advanced": true,
+      "placeholder": "6",
+      "help": "Maximum lane-snapshot memories injected once per session"
+    },
+    "startupTimeoutMs": {
+      "label": "Sidecar Startup Timeout (ms)",
+      "advanced": true,
+      "placeholder": "120000",
+      "help": "How long to wait for the memory sidecar to come up (first uvx run may download the package)"
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "persona": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 200
+      },
+      "dbPath": {
+        "type": "string"
+      },
+      "agentId": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "pythonPath": {
+        "type": "string"
+      },
+      "autoRecall": {
+        "type": "boolean"
+      },
+      "autoCapture": {
+        "type": "boolean"
+      },
+      "allowDownload": {
+        "type": "boolean"
+      },
+      "topK": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 10
+      },
+      "bootK": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 20
+      },
+      "startupTimeoutMs": {
+        "type": "integer",
+        "minimum": 5000,
+        "maximum": 600000
+      }
+    },
+    "required": ["persona"]
+  }
+}

@@ -14,7 +14,7 @@ engram-lite is that serving layer, small enough to run on your laptop:
 - **Zero infrastructure.** No server, no cloud, no accounts, no telemetry. SQLite plus a local embedding model. `pip install` and you are running.
 - **Explainable forgetting.** Every drop, merge, truncation, and abstention is recorded with the rule that fired (`Memory.decisions()`). "Why don't you remember X?" has an answer — something an LLM-written memory can't give you, because its keep/drop decisions live inside model weights.
 - **Deterministic and replayable.** Same transcript in, same memory out — byte-identical across rebuilds. Memory failures can be diffed, bisected, and regression-gated like any other bug.
-- **Plugs into what you build with.** A Hermes memory provider, or three lines of Python.
+- **Plugs into what you build with.** A Hermes memory provider, a Claude Code plugin, an OpenClaw plugin, or three lines of Python — all sharing one store, each agent served its own lane.
 
 > engram-lite is single-machine by design. A team/hosted edition, **engram-core**, is in development — reach out if that is what you need.
 
@@ -75,8 +75,6 @@ Three steps on any machine with Hermes installed:
 ```bash
 # 1. put the engine in Hermes's environment
 pip install engram-lite
-#    (before the PyPI release, install straight from the repo instead:
-#     pip install git+https://github.com/engrammemory-labs/engram-lite.git)
 
 # 2. install the memory plugin
 hermes plugins install engrammemory-labs/engram-lite/hermes-plugin/engram
@@ -91,6 +89,8 @@ hermes memory setup     # choose "engram", answer one question — what is this
 
 Then just `hermes chat`. From that point: every turn is auto-captured through the salience gate, the agent boots with a snapshot of what it already knows, and `memory_search` / `memory_write` / `memory_diagnose` are available as in-loop tools. Restart the agent; it remembers. Point several agents at one `db_path` (a wizard field) and the lane model keeps each one's serving scoped.
 
+Wondering whether memory is actually operating? `engram doctor` gives the one-screen answer (configs, stores, fact counts, why turns were kept or skipped), and `engram diagnose` narrates the capture gate's decisions in plain English. An empty store early on is normal: questions and chatter are deliberately not stored. And if `hermes plugins list` ever shows the plugin as disabled, `hermes plugins enable engram` brings the listing in line — memory keeps working either way, because Hermes loads the provider from its memory config, not from that flag.
+
 Building your own harness instead of Hermes? The same provider is a plain Python class:
 
 ```python
@@ -103,6 +103,35 @@ memory = EngramMemoryProvider(
 )
 # call initialize / system_prompt_block / prefetch / sync_turn / shutdown
 ```
+
+## Plug into Claude Code
+
+```bash
+pip install engram-lite
+engram claude setup        # one question, one consent — memory is live
+```
+
+Setup wires three hooks into Claude Code (with your consent, a backup, and
+`engram claude uninstall` to reverse it): every prompt is captured through the
+salience gate, memories that fit the current prompt are served each turn, and
+a memory snapshot is re-injected after `/clear` and compaction — the moments
+context is lost are the moments memory matters. Everything fails open: if the
+local daemon is down, the session simply behaves like stock Claude Code.
+
+Prefer a plugin-native install? This repo is a Claude Code plugin marketplace:
+`/plugin marketplace add engrammemory-labs/engram-lite`, then
+`/plugin install engram@engram`. Details in [`claude-plugin/`](claude-plugin/README.md).
+
+## Plug into OpenClaw
+
+A memory-slot plugin lives in [`openclaw-plugin/`](openclaw-plugin/README.md):
+auto-recall before each prompt, auto-capture after each run,
+`memory_search` / `memory_store` / `memory_diagnose` tools, and a one-question
+`openclaw engram setup`. It supervises the same local daemon the Claude Code
+hooks use — point both at one store and your agents share memory, each served
+its own lane. A NemoClaw sandbox recipe ships alongside it; the memory loop
+runs with zero egress, proven by a harness you can re-run
+([`openclaw-plugin/nemoclaw/proof/`](openclaw-plugin/nemoclaw/proof)).
 
 ## The numbers behind the claims
 
@@ -131,6 +160,17 @@ Measured on a real 15-agent shared store (92 memories, 105 probes), same recall 
 | **engram-lite conditioned serving** | **29** | **0** | **100%** |
 
 And the memory layer itself bills nothing: zero LLM calls at capture, zero at serving. (LLM-extraction pipelines spend ~2 model calls per captured turn to build memory; engram-lite spends none, and nothing leaves your machine.)
+
+### Lane serving at scale
+
+One shared store, four profiled lanes, real embedder, measured through the
+daemon's HTTP path on an Apple-silicon laptop (`benchmarks/lane_stress.py`,
+re-runnable):
+
+| Store size | Search p50 | p95 | Top-1 retrieval | Cross-lane leaks |
+|---|---|---|---|---|
+| 5,000 facts | 35 ms | 48 ms | 98.5% | 0/100 |
+| 20,000 facts | 94 ms | 114 ms | 99.0% | 0/100 |
 
 ### CAMP-Bench: conditioned serving vs the flat pile
 

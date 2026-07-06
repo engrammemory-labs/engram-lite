@@ -64,6 +64,12 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS store_meta (
+    key   TEXT PRIMARY KEY,   -- store-level settings that must survive process churn
+    value TEXT NOT NULL       -- e.g. max_facts: the cap is a property of the STORE,
+                              -- not of whichever process happens to open it
+);
+
 CREATE TABLE IF NOT EXISTS decisions (
     id      INTEGER PRIMARY KEY AUTOINCREMENT,
     ts      TEXT NOT NULL,

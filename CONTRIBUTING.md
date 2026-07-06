@@ -20,8 +20,8 @@ ruff check src
   telemetry. Anything that needs a model or a server is out of scope for
   engram-lite.
 - `storage/repository.py` is the only module that writes SQL.
-- Never print to stdout in library or MCP code paths (stdout is the MCP stdio
-  protocol channel); use stderr.
+- Never print to stdout in library or daemon code paths — the daemon's first
+  stdout line is its machine-read startup contract; diagnostics go to stderr.
 - Keep the public API small. If a knob can be a constant in `config.py`, it is
   not a parameter.
 

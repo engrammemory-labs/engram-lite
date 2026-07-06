@@ -1,8 +1,13 @@
 """Build-time knobs — constants the engine is tuned with.
 
-Distinct from `settings.py`, which reads *runtime* flags from environment variables.
+Distinct from `settings.py`, which reads *runtime* flags from environment
+variables. One deliberate exception below: MAX_FACTS accepts an env override,
+because a store shared by several integrations needs its ceiling set by the
+deployment, not the build.
 """
 from __future__ import annotations
+
+import os
 
 # ── storage ──────────────────────────────────────────────────────────────────
 DEFAULT_DB_PATH = "engram.db"   # one SQLite file holds everything (STORAGE_AND_RETRIEVAL §3)
@@ -76,4 +81,6 @@ VALUE_CHAR_CAP = 1000         # the stored value is capped (guardrail against bl
 MAX_TEXT_CHARS = 2000         # longer than this → assumed file/output dump, skip saving
 
 # ── size limit / eviction ────────────────────────────────────────────────────
-MAX_FACTS = 5000              # per DB; least-used facts are evicted beyond this
+# Per DB; least-used facts are evicted beyond this. ENGRAM_MAX_FACTS raises it
+# for stores shared across integrations (several lanes, one file).
+MAX_FACTS = int(os.environ.get("ENGRAM_MAX_FACTS", "5000"))

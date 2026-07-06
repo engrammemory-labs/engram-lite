@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import functools
 import json
+import os
 import threading
 import uuid
 from typing import List, Optional
@@ -89,12 +90,27 @@ class Memory:
 
     def __init__(self, path: str = config.DEFAULT_DB_PATH,
                  embedder: Optional[Embedder] = None, origin_tool: Optional[str] = None,
-                 max_facts: int = config.MAX_FACTS):
+                 max_facts: Optional[int] = None):
         self.embedder = embedder or get_embedder()
         self.origin_tool = origin_tool          # provenance: which tool/agent is writing
-        self.max_facts = max_facts
         self._lock = threading.RLock()          # serialize all connection access
         self.conn = db.connect(path, dim=self.embedder.dim)
+        # The eviction cap is a property of the STORE, persisted in store_meta:
+        # a store seeded at a 25k ceiling must never be mass-evicted because a
+        # later process opened it without ENGRAM_MAX_FACTS in its environment.
+        # Precedence: explicit arg > env (records a new ceiling) > the store's
+        # own recorded cap > the build default.
+        stored = repository.get_meta(self.conn, "max_facts")
+        if max_facts is not None:
+            self.max_facts = max_facts
+        elif "ENGRAM_MAX_FACTS" in os.environ:
+            self.max_facts = int(os.environ["ENGRAM_MAX_FACTS"])
+        elif stored is not None:
+            self.max_facts = int(stored)
+        else:
+            self.max_facts = config.MAX_FACTS
+        if stored is None or int(stored) != self.max_facts:
+            repository.set_meta(self.conn, "max_facts", str(self.max_facts))
 
     # ── PROFILES (conditioned promotion) ─────────────────────────────────────
     @_locked

@@ -1,0 +1,48 @@
+{
+  "name": "@engrammemorylabs/openclaw-engram",
+  "version": "0.1.0",
+  "description": "Deterministic long-term memory for OpenClaw. A loopback sidecar serves each agent the memory that fits its role — no cloud calls, no API keys, and a decision ledger that explains every keep, merge, and drop.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/engrammemory-labs/engram-lite"
+  },
+  "keywords": [
+    "openclaw",
+    "memory",
+    "plugin",
+    "local-first",
+    "deterministic"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/*.test.ts\"",
+    "prepublishOnly": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "install": {
+      "npmSpec": "@engrammemorylabs/openclaw-engram",
+      "defaultChoice": "npm",
+      "minHostVersion": ">=2026.5.31"
+    },
+    "compat": {
+      "pluginApi": ">=2026.6.11"
+    }
+  },
+  "files": [
+    "index.ts",
+    "src/",
+    "types/",
+    "openclaw.plugin.json",
+    "README.md",
+    "LICENSE"
+  ]
+}

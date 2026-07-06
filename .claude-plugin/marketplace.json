@@ -1,0 +1,14 @@
+{
+  "name": "engram",
+  "owner": {
+    "name": "Engram Memory Labs",
+    "url": "https://github.com/engrammemory-labs/engram-lite"
+  },
+  "plugins": [
+    {
+      "name": "engram",
+      "source": "./claude-plugin",
+      "description": "Deterministic long-term memory: every prompt captured, role-scoped memories served each turn, memory that survives /clear and compaction. Local only."
+    }
+  ]
+}
